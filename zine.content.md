@@ -25,22 +25,30 @@ Write some Markdown inside the HTML file. It will be converted into
 HTML and be rendered in your Browser.
 
 Write Text. Use images. Let your imagination flow.
-
 As long as your Browser can display it, it is fine to use.
 
-##
-
 Each Page is a chapter of the markdown file.
-
 The chapters title is used as a page title. You are free to leave the
 title empty. It will not be inserted into the page.
 
+## A local webserver
+
+To load the Markdown file from your disc a webserver is needed. Any
+server that can serve static files will do. May languages like Pyhton, PHP
+or Java (18+) and many others do have this ability.
+
+If you are not able to run such a server you can edit the `index.hmtl`
+directly. Find the `id="zinecontent"` tag and write the markdown content
+there.
+
 ## CSS
 
-CSS is used to "place" and size each page of your zine.
-You can place your own styles inside the page.
+CSS is used to "place" and size each page of your zine. Some classes can
+be used to layout your pages.
 
-Some 
+You can place your own styles inside the markdown file. Just use
+a pair of `<style></style>` tags. A good place is after the first
+header at the beginning of the document.
 
 ## 
 
@@ -54,6 +62,7 @@ Some
 
 `.page8`
 : The back page
+
 
 
 ## Images
