@@ -76,11 +76,11 @@ function createZine(rawMdText) {
 }
 
 
-const source = document.getElementById('zinecontent');
 
 function loadSource() {
+  const source = document.getElementById('zinecontent');
+  console.log('loaded',source.contentDocument);
   if (source.contentDocument) {
-    //console.log(source.contentDocument);
     let fulltext = source.contentDocument.body.textContent;
     if (fulltext.includes('<style>')) {
       let start = fulltext.indexOf('<style>');
@@ -97,13 +97,30 @@ function loadSource() {
     } else {
       createZine(source.contentDocument.body.textContent);
     }
+  }else if(source.innerText !== ''){
+    //Fallback 
+    createZine(source.innerText);
+  }else{
+    console.log('no source', source);
   }
 }
 
-source.onload = loadSource;
-const query = new URLSearchParams(location.search);
-if (query.has('file')) {
-  source.setAttribute('data', query.get('file'));
-} else {
-  loadSource();
+function init(){
+  console.log('init');
+  const source = document.getElementById('zinecontent');
+  source.onload = loadSource;
+  const query = new URLSearchParams(location.search);
+  if (query.has('file')) {
+    source.setAttribute('data', query.get('file'));
+  } else if(source.contentDocument){
+    //loadSource();
+    console.log('init',source.contentDocument);
+  }
+}
+
+if(document.readyState==='loading'){
+  console.log('waiting...');
+  document.addEventListener('DOMContentLoaded', init);
+}else{
+  init();
 }
