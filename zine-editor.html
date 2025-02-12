@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Zine Editor</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="zine.css" >
+    <script src="./zine.js" type="module"></script>
+    <script src="./markdown-it.min.js"></script>
+    <script src="./markdown-it-deflist.min.js"></script>
+  </head>
+  <body>
+    <input class="noprint noview" id="sizeA4" type="radio" name="sheetsize" value="A4" checked>
+    <input class="noprint noview" id="sizeLetter" type="radio" name="sheetsize" value="Letter">
+    <input class="noprint noview" id="rotate" type="checkbox" name="rotate">
+    <input class="noprint noview" id="ordered" type="checkbox" name="ordered">
+    <input class="noprint noview" id="borderless" type="checkbox" name="borderless">
+    <div class="noprint">
+      <p>Sheet size:
+        <label class="selector" for="sizeA4">DIN/ISO A4</label>
+        <label class="selector" for="sizeLetter">US Letter</label>
+      </p>
+      <p>
+        <label class="selector" for="borderless">No margings</label>
+        <label class="selector" for="ordered">View in page order</label>
+        <label class="selector" for="rotate">View rotated zine</label>
+      </p>
+    </div>
+    <div id="zine">
+      <object id="zinecontent" data="zine.content.md"></object>
+    </div>
+    <template id="pagebase">
+      <div class="page">
+        <div class="content">
+        </div>
+        <div class="footer">
+          <p class="pagenum">page 1</p>
+        </div>
+      </div>
+    </template>
+  </body>
+</html>
