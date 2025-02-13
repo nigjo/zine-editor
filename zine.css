@@ -74,6 +74,12 @@
   box-sizing:border-box;
   padding:var(--border);
   overflow:hidden;
+  .content{
+    height: 100%;
+    p{
+      margin:2mm 0px;
+    }
+  }
   .footer{
     position: absolute;
     color:silver;
@@ -136,8 +142,8 @@ p:has(img.fullSize) {
     width:calc(var(--page-height) / 4 - 2 * var(--border));
   }
   position:absolute !important;
-	top:var(--border);
-	left:var(--border);
+  top:var(--border);
+  left:var(--border);
   z-index:2;
 }
 
