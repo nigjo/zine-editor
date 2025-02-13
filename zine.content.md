@@ -17,13 +17,14 @@
       border-left:1mm solid silver;
       padding-left:2mm;
     }
+    p:has(img.center){text-align: center;}
   }
 </style>
 -->
 
-a
-Markdown/HTML based  
-Zine editor
+A  
+Markdown/Browser  
+based Zine creator
 
 ![Anleitung](zine-guide-b-w.png "height50")
 
@@ -49,7 +50,7 @@ or Java (18+) and many others do have this ability.
 > directly. Find the `id="zinecontent"` tag and write the markdown content
 > there.
 
-## CSS
+## Custom Styles
 
 CSS is used to "place" and size each page of your zine. Some classes can
 be used to layout your pages.
@@ -60,9 +61,7 @@ header at the beginning of the document.
 
 > Wrap the styles in HTML comments to hide it in your own markdown processor.
 
-## 
-
-### Classes
+## Editor styles
 
 `.page`
 : Format all pages
@@ -90,20 +89,42 @@ header at the beginning of the document.
 
 ## Images
 
-Image are sized to fit one page.
+Image are sized to fit a pages width.
 
-## 
+This tool utilizes the markdown "title" of an image to simulation css classes.
+These classes can be used to "shrink" the image even more.
 
-TODO write content
+Use `width50` to limit the width to 50% of the page. The sizes are
+`25`, `33`, `50`, `66` or `75`.
+
+Use "Custom Styles" to do more image styling.
+
+## Printing
+
+Your zine can be printed on DIN/ISO A4 or US Letter sizes sheets of paper.
+Select your favourite size on the top of the editor.
+
+Use the default printing function of your browser. Select the right paper size
+and set the "border size" to "none".
+
+Most browsers have an option to "save as PDF".
+This is great to distribute your zine to the world.
 
 ##
 
 
-This editor uses simple Browser features. Just open this HTML Page in
-your Browser from a local path.
+**Zine editor**
+
+&copy; 2025 by Nigjo Iqn
+
+Licence: Apache 2.0
 
 Sources:  
-https://github.com/nigjo/
+`https://github.com/nigjo/zine-editor/`
+
+markdown-it, MIT license  
+`https://github.com/markdown-it/`
 
 Title image author unknown
 
+![a book](favicon.png "center width33")
