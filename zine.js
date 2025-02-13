@@ -79,48 +79,55 @@ function createZine(rawMdText) {
 
 function loadSource() {
   const source = document.getElementById('zinecontent');
-  console.log('loaded',source.contentDocument);
+  console.log('loaded', source.contentDocument);
   if (source.contentDocument) {
     let fulltext = source.contentDocument.body.textContent;
+    //find zine-specific styles
     if (fulltext.includes('<style>')) {
-      let start = fulltext.indexOf('<style>');
-      let end = fulltext.indexOf('</style>', start);
+      const start = fulltext.indexOf('<style>');
+      const end = fulltext.indexOf('</style>', start);
       if (start >= 0 && end > 0) {
-        let mdText =
+        const mdText =
                 fulltext.substring(0, start) + fulltext.substring(end + '</style>'.length);
-        createZine(mdText);
         document.head.insertAdjacentHTML('beforeend',
                 fulltext.substring(start, end + '</style>'.length));
-      } else {
-        createZine(source.contentDocument.body.textContent);
+        fulltext = mdText;
       }
-    } else {
-      createZine(source.contentDocument.body.textContent);
     }
-  }else if(source.innerText !== ''){
+    //remove HTML comments before processing
+    while (fulltext.includes('<!--')) {
+      const start = fulltext.indexOf('<!--');
+      const end = fulltext.indexOf('-->', start);
+      const mdText =
+              fulltext.substring(0, start)
+              + fulltext.substring(end + '</style>'.length);
+      fulltext = mdText;
+    }
+    createZine(fulltext);
+  } else if (source.innerText !== '') {
     //Fallback 
     createZine(source.innerText);
-  }else{
+  } else {
     console.log('no source', source);
   }
 }
 
-function init(){
+function init() {
   console.log('init');
   const source = document.getElementById('zinecontent');
   source.onload = loadSource;
   const query = new URLSearchParams(location.search);
   if (query.has('file')) {
     source.setAttribute('data', query.get('file'));
-  } else if(source.contentDocument){
+  } else if (source.contentDocument) {
     //loadSource();
-    console.log('init',source.contentDocument);
+    console.log('init', source.contentDocument);
   }
 }
 
-if(document.readyState==='loading'){
+if (document.readyState === 'loading') {
   console.log('waiting...');
   document.addEventListener('DOMContentLoaded', init);
-}else{
+} else {
   init();
 }
