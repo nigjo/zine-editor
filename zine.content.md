@@ -4,13 +4,19 @@
 <style>
   .page{
     font-family:sans-serif;
-  }
-  .page1 .content{
-    display:flex;
-    flex-direction: column;
-    justify-items: stretch;
-    text-align:center;
-    font-family:Consolas;
+    &.page1 .content{
+      display:flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-evenly;
+      text-align:center;
+      font-family:Consolas;
+    }
+    blockquote{
+      margin-left:0mm;
+      border-left:1mm solid silver;
+      padding-left:2mm;
+    }
   }
 </style>
 -->
@@ -39,9 +45,9 @@ To load the Markdown file from your disc a webserver is needed. Any
 server that can serve static files will do. May languages like Pyhton, PHP
 or Java (18+) and many others do have this ability.
 
-If you are not able to run such a server you can edit the `index.hmtl`
-directly. Find the `id="zinecontent"` tag and write the markdown content
-there.
+> If you are not able to run such a server you can edit the `index.hmtl`
+> directly. Find the `id="zinecontent"` tag and write the markdown content
+> there.
 
 ## CSS
 
@@ -51,6 +57,8 @@ be used to layout your pages.
 You can place your own styles inside the markdown file. Just use
 a pair of `<style></style>` tags. A good place is after the first
 header at the beginning of the document.
+
+> Wrap the styles in HTML comments to hide it in your own markdown processor.
 
 ## 
 
@@ -65,6 +73,19 @@ header at the beginning of the document.
 `.page8`
 : The back page
 
+`.content`
+: The block inside a `.page` with the generated HTML.
+
+```css
+.page {
+  &.page1 .content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly
+  }
+}
+```
 
 
 ## Images
