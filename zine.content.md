@@ -1,5 +1,6 @@
 # Zine Editor
 
+<!--
 <style>
   .page{
     font-family:sans-serif;
@@ -12,6 +13,7 @@
     font-family:Consolas;
   }
 </style>
+-->
 
 a
 Markdown/HTML based  
