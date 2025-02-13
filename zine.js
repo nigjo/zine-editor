@@ -10,17 +10,33 @@ const md = markdownit().use(markdownitDeflist);
 
 const fileManager = {
   files: {},
+  data: {},
   addFile: (file) => {
+    fileManager.removeFile(file.name);
     fileManager.files[file.name] = file;
   },
   removeFile: (filename) => {
     delete fileManager.files[filename];
+    if (filename in fileManager.data) {
+      URL.revokeObjectURL(fileManager.data[filename]);
+      delete fileManager.data[filename];
+    }
   },
   hasFile: (filename) => Object.keys(fileManager.files).includes(filename),
   getFile: (filename) => {
     if (filename in fileManager.files)
       return fileManager.files[filename];
     return null;
+  },
+  getData: (filename) => {
+    if (filename in fileManager.files) {
+      if (filename in fileManager.data)
+        return fileManager.data[filename];
+      fileManager.data[filename] =
+              URL.createObjectURL(fileManager.files[filename]);
+      return fileManager.data[filename];
+    }
+    return undefined;
   },
   updateList: () => {
     console.log(Object.keys(fileManager.files));
@@ -108,8 +124,14 @@ function createZine(rawMdText) {
       img.className = img.title;
       img.removeAttribute('title');
     }
-    if (fileManager.hasFile(img.src)) {
-      //TODO: replace
+    const filename = img.getAttribute('src');
+    console.log(filename);
+    if (fileManager.hasFile(filename)) {
+      const data = fileManager.getData(filename);
+      if (data) {
+        img.src = data;
+        console.log('replaced');
+      }
     }
   }
 
