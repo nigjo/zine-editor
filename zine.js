@@ -100,7 +100,7 @@ function loadSource() {
       const end = fulltext.indexOf('-->', start);
       const mdText =
               fulltext.substring(0, start)
-              + fulltext.substring(end + '</style>'.length);
+              + fulltext.substring(end + '-->'.length);
       fulltext = mdText;
     }
     createZine(fulltext);
