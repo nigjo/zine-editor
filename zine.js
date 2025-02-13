@@ -8,8 +8,96 @@
 
 const md = markdownit().use(markdownitDeflist);
 
+const fileManager = {
+  files: {},
+  addFile: (file) => {
+    fileManager.files[file.name] = file;
+  },
+  removeFile: (filename) => {
+    delete fileManager.files[filename];
+  },
+  hasFile: (filename) => Object.keys(fileManager.files).includes(filename),
+  getFile: (filename) => {
+    if (filename in fileManager.files)
+      return fileManager.files[filename];
+    return null;
+  },
+  updateList: () => {
+    console.log(Object.keys(fileManager.files));
+    let mdFile = null;
+    const container = document.createElement('div');
+    container.classList.add('filelist');
+
+    for (const file of Object.values(fileManager.files)) {
+      console.log(file);
+      if (!mdFile && file.name.endsWith('md')) {
+        mdFile = file;
+      }
+      const fig = document.createElement('figure');
+      fig.dataset.filename = file.name;
+
+      const del = document.createElement('button');
+      del.textContent = '\uD83D\uDDD1';
+      del.onclick = () => {
+        console.log('remove', file.name);
+        fileManager.removeFile(file.name);
+        fileManager.updateList()
+                .then(d => createZine(d))
+                .catch(e => console.error(e));
+        ;
+      };
+      fig.append(del);
+
+      const cap = document.createElement('figcaption');
+      cap.textContent = file.name;
+      fig.append(cap);
+
+      container.append(fig);
+    }
+
+    document.querySelector('#files .filelist').replaceWith(container);
+
+    if (mdFile) {
+      return mdFile.text();
+    }
+    return Promise.resolve('# Error\n\nNo markdown file found.');
+  }
+};
+
 function createZine(rawMdText) {
-  const resultText = md.render(rawMdText);
+
+  document.getElementById('custom')?.remove();
+
+  let plainMdText = rawMdText;
+  if (plainMdText.includes('<style>')) {
+    const start = plainMdText.indexOf('<style>');
+    const end = plainMdText.indexOf('</style>', start);
+    if (start >= 0 && end > 0) {
+      const mdText = plainMdText.substring(0, start)
+              + plainMdText.substring(end + '</style>'.length);
+      document.head.insertAdjacentHTML('beforeend',
+              plainMdText.substring(start, end + '</style>'.length));
+      document.head.lastElementChild.id = 'custom';
+      plainMdText = mdText;
+    }
+  } else {
+    //add placeholder
+    document.head.insertAdjacentHTML('beforeend',
+            '<style id="custom"></style>');
+  }
+
+  //remove HTML comments before processing
+  while (plainMdText.includes('<!--')) {
+    const start = plainMdText.indexOf('<!--');
+    const end = plainMdText.indexOf('-->', start);
+    const mdText =
+            plainMdText.substring(0, start)
+            + plainMdText.substring(end + '-->'.length);
+    plainMdText = mdText;
+  }
+
+
+  const resultText = md.render(plainMdText);
 
   const mdData = document.createElement('template');
   mdData.innerHTML = resultText;
@@ -20,10 +108,13 @@ function createZine(rawMdText) {
       img.className = img.title;
       img.removeAttribute('title');
     }
+    if (fileManager.hasFile(img.src)) {
+      //TODO: replace
+    }
   }
 
   const pages = document.createElement('div');
-  pages.id = "pages";
+  pages.id = "zinecontent";
   //const pages = document.createDocumentFragment();
   const pageTpl = document.getElementById('pagebase');
   let page = 1;
@@ -80,36 +171,43 @@ function createZine(rawMdText) {
 function loadSource() {
   const source = document.getElementById('zinecontent');
   console.log('loaded', source.contentDocument);
+  let fileContent = '';
   if (source.contentDocument) {
-    let fulltext = source.contentDocument.body.textContent;
+    fileContent = source.contentDocument.body.textContent;
     //find zine-specific styles
-    if (fulltext.includes('<style>')) {
-      const start = fulltext.indexOf('<style>');
-      const end = fulltext.indexOf('</style>', start);
-      if (start >= 0 && end > 0) {
-        const mdText =
-                fulltext.substring(0, start) + fulltext.substring(end + '</style>'.length);
-        document.head.insertAdjacentHTML('beforeend',
-                fulltext.substring(start, end + '</style>'.length));
-        fulltext = mdText;
-      }
-    }
-    //remove HTML comments before processing
-    while (fulltext.includes('<!--')) {
-      const start = fulltext.indexOf('<!--');
-      const end = fulltext.indexOf('-->', start);
-      const mdText =
-              fulltext.substring(0, start)
-              + fulltext.substring(end + '-->'.length);
-      fulltext = mdText;
-    }
-    createZine(fulltext);
   } else if (source.innerText !== '') {
     //Fallback 
-    createZine(source.innerText);
+    fileContent = source.innerText;
   } else {
     console.log('no source', source);
+    return;
   }
+  createZine(fileContent);
+}
+
+function initDragging(ev) {
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = "copy";
+  document.body.classList.add('dragging');
+  //console.log(ev);
+}
+
+function handleNewFiles(ev) {
+  ev.preventDefault();
+  console.log(ev);
+  document.body.classList.remove('dragging');
+  [...ev.dataTransfer.items].forEach((item, i) => {
+    // If dropped items aren't files, reject them
+    if (item.kind === "file") {
+      const file = item.getAsFile();
+      console.log(`… file[${i}].name = ${file.name}`);
+      fileManager.addFile(file);
+    }
+  });
+
+  fileManager.updateList()
+          .then(d => createZine(d))
+          .catch(e => console.error(e));
 }
 
 function init() {
@@ -123,6 +221,16 @@ function init() {
     //loadSource();
     console.log('init', source.contentDocument);
   }
+  const target = document.body;
+  target.addEventListener("dragover", ev => ev.preventDefault());
+  target.addEventListener("dragleave", ev => {
+    ev.preventDefault();
+    if (ev.target.id === 'files') {
+      document.body.classList.remove('dragging');
+    }
+  });
+  target.addEventListener("dragenter", initDragging);
+  target.addEventListener("drop", handleNewFiles);
 }
 
 if (document.readyState === 'loading') {
