@@ -125,6 +125,7 @@ Sources:
 markdown-it, MIT license  
 `https://github.com/markdown-it/`
 
-Title image author unknown
+Title image by
+[Daisy Wakefield](https://www.42ndstreet.org.uk/support/read/how-to-make-your-own-zine/)
 
 ![a book](favicon.png "center width33")
