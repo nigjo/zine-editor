@@ -18,6 +18,12 @@
       padding-left:2mm;
     }
     p:has(img.center){text-align: center;}
+    a{text-decoration:none;}
+  }
+  @media print{
+    .page{
+      a{color:inherit;}
+    }
   }
 </style>
 -->
@@ -26,7 +32,7 @@ A
 Markdown/Browser  
 based Zine creator
 
-![Anleitung](zine-guide-b-w.png "height50")
+![graphical guide](zine-guide-b-w.png "height50")
 
 ## Markdown and HTML
 
@@ -128,4 +134,4 @@ markdown-it, MIT license
 Title image by
 [Daisy Wakefield](https://www.42ndstreet.org.uk/support/read/how-to-make-your-own-zine/)
 
-![a book](favicon.png "center width33")
+![a book with a 'Ta da' cover](book.png "center width33")

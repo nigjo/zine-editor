@@ -10,6 +10,6 @@ As long as your Browser can display it, it is fine to use.
 
 ##
 
-Read the [Sample zine](zine.content.md) for details.
+Read the [Sample zine](userguide/zine.content.md) for details.
 
 ![a book](favicon.png)

@@ -76,7 +76,7 @@ const fileManager = {
     if (mdFile) {
       return mdFile.text();
     }
-    return Promise.resolve('# Error\n\nNo markdown file found.');
+    return Promise.resolve('# Error\n\nNo markdown file found.\nadd one `.md` file.');
   }
 };
 
@@ -118,6 +118,7 @@ function createZine(rawMdText) {
   const mdData = document.createElement('template');
   mdData.innerHTML = resultText;
 
+  const basedir = document.getElementById('zinecontent').dataset.basedir;
   //console.log('IMG', mdData.content.querySelectorAll('img'));
   for (const img of mdData.content.querySelectorAll('img')) {
     if (img.title) {
@@ -132,6 +133,9 @@ function createZine(rawMdText) {
         img.src = data;
         console.log('replaced');
       }
+    } else if (basedir) {
+      console.log('rebased');
+      img.src = basedir + '/' + filename;
     }
   }
 
