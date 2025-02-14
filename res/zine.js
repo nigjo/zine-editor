@@ -80,7 +80,7 @@ const fileManager = {
   }
 };
 
-function createZine(rawMdText) {
+function createZine(rawMdText, basedir) {
 
   document.getElementById('custom')?.remove();
 
@@ -118,7 +118,6 @@ function createZine(rawMdText) {
   const mdData = document.createElement('template');
   mdData.innerHTML = resultText;
 
-  const basedir = document.getElementById('zinecontent').dataset.basedir;
   //console.log('IMG', mdData.content.querySelectorAll('img'));
   for (const img of mdData.content.querySelectorAll('img')) {
     if (img.title) {
@@ -208,7 +207,7 @@ function loadSource() {
     console.log('no source', source);
     return;
   }
-  createZine(fileContent);
+  createZine(fileContent, source.dataset.basedir);
 }
 
 function initDragging(ev) {
@@ -234,6 +233,16 @@ function handleNewFiles(ev) {
   fileManager.updateList()
           .then(d => createZine(d))
           .catch(e => console.error(e));
+}
+
+function loadZine(basedir, mdfile) {
+  fetch(basedir + '/' + mdfile).then(r => {
+    if (r.ok)
+      return r.text();
+    throw r;
+  }).then(mdtext => {
+    createZine(mdtext, basedir);
+  });
 }
 
 function init() {

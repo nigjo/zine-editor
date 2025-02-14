@@ -16,6 +16,18 @@
   height:var(--page-width);
   box-sizing:content-box;
 }
+nav{
+  margin:2mm;
+  button{
+    border:none;
+    padding:1mm 2mm;
+    &:hover{
+      background-color:darkblue;
+      color:aliceblue;
+      cursor:pointer;
+    }
+  }
+}
 object#zinecontent{
   width: 100%;
   height:calc(100% - 1mm);
