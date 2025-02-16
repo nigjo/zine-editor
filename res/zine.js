@@ -1,3 +1,5 @@
+/* global markdownit, markdownitDeflist */
+
 "use strict";
 //import markdownit from 'https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/+esm';
 //import markdownit from './markdown-it.min.js';
@@ -6,46 +8,60 @@
 //import markdownitDeflist from 'https://cdn.jsdelivr.net/npm/markdown-it-deflist@3.0.0/+esm';
 //import markdownitDeflist from './markdown-it-deflist.min.js';
 
-const md = markdownit().use(markdownitDeflist);
+const md = markdownit()
+        .use(markdownitDeflist);
 
-const fileManager = {
-  files: {},
-  data: {},
-  addFile: (file) => {
-    fileManager.removeFile(file.name);
-    fileManager.files[file.name] = file;
-  },
-  removeFile: (filename) => {
-    delete fileManager.files[filename];
-    if (filename in fileManager.data) {
-      URL.revokeObjectURL(fileManager.data[filename]);
-      delete fileManager.data[filename];
+class FileManager {
+  constructor() {
+    this.projectname = 'default';
+    this.files = {};
+    this.data = {};
+  }
+  addFile(file) {
+    this.removeFile(file.name);
+    this.files[file.name] = file;
+  }
+  removeFile(filename) {
+    delete this.files[filename];
+    if (filename in this.data) {
+      URL.revokeObjectURL(this.data[filename]);
+      delete this.data[filename];
     }
-  },
-  hasFile: (filename) => Object.keys(fileManager.files).includes(filename),
-  getFile: (filename) => {
-    if (filename in fileManager.files)
-      return fileManager.files[filename];
+  }
+  hasFile(filename) {
+    return Object.keys(this.files).includes(filename);
+  }
+  getFile(filename) {
+    if (filename in this.files)
+      return this.files[filename];
     return null;
-  },
-  getData: (filename) => {
-    if (filename in fileManager.files) {
-      if (filename in fileManager.data)
-        return fileManager.data[filename];
-      fileManager.data[filename] =
-              URL.createObjectURL(fileManager.files[filename]);
-      return fileManager.data[filename];
+  }
+  getData(filename) {
+    if (filename in this.files) {
+      if (filename in this.data)
+        return this.data[filename];
+      this.data[filename] =
+              URL.createObjectURL(this.files[filename]);
+      return this.data[filename];
     }
     return undefined;
-  },
-  updateList: () => {
-    console.log(Object.keys(fileManager.files));
+  }
+  reset() {
+    const names = Object.keys(this.files);
+    const context = this;
+    names.forEach(n => context.removeFile(n));
+    this.updateList().catch(() => {
+      /*ignore errors here*/
+    });
+  }
+  updateList() {
+    //console.debug(Object.keys(this.files));
     let mdFile = null;
     const container = document.createElement('div');
     container.classList.add('filelist');
 
-    for (const file of Object.values(fileManager.files)) {
-      console.log(file);
+    for (const file of Object.values(this.files)) {
+      //console.debug(file);
       if (!mdFile && file.name.endsWith('md')) {
         mdFile = file;
       }
@@ -55,9 +71,9 @@ const fileManager = {
       const del = document.createElement('button');
       del.textContent = '\uD83D\uDDD1';
       del.onclick = () => {
-        console.log('remove', file.name);
-        fileManager.removeFile(file.name);
-        fileManager.updateList()
+        console.log('removing', file.name);
+        this.removeFile(file.name);
+        this.updateList()
                 .then(d => createZine(d))
                 .catch(e => console.error(e));
         ;
@@ -76,9 +92,14 @@ const fileManager = {
     if (mdFile) {
       return mdFile.text();
     }
-    return Promise.resolve('# Error\n\nNo markdown file found.\nadd one `.md` file.');
+    return Promise.reject('No markdown file found.\nadd one `.md` file.');
   }
-};
+}
+const fileManager = new FileManager();
+
+function createErrorZine(message) {
+  createZine('# Error\n\n' + message);
+}
 
 function createZine(rawMdText, basedir) {
 
@@ -118,23 +139,23 @@ function createZine(rawMdText, basedir) {
   const mdData = document.createElement('template');
   mdData.innerHTML = resultText;
 
-  //console.log('IMG', mdData.content.querySelectorAll('img'));
+  //console.debug('IMG', mdData.content.querySelectorAll('img'));
   for (const img of mdData.content.querySelectorAll('img')) {
     if (img.title) {
       img.className = img.title;
       img.removeAttribute('title');
     }
     const filename = img.getAttribute('src');
-    console.log(filename);
+    //console.debug(filename);
     if (fileManager.hasFile(filename)) {
       const data = fileManager.getData(filename);
       if (data) {
         img.src = data;
-        console.log('replaced');
+        console.debug('replaced', filename);
       }
     } else if (basedir) {
-      console.log('rebased');
       img.src = basedir + '/' + filename;
+      console.debug('rebased', filename);
     }
   }
 
@@ -236,36 +257,70 @@ function handleNewFiles(ev) {
 }
 
 function loadZine(basedir, mdfile) {
+  //console.debug(basedir, mdfile);
   fetch(basedir + '/' + mdfile).then(r => {
     if (r.ok)
       return r.text();
     throw r;
   }).then(mdtext => {
+    fileManager.reset();
     createZine(mdtext, basedir);
   });
 }
 
 function init() {
   console.log('init');
-  const source = document.getElementById('zinecontent');
-  source.onload = loadSource;
-  const query = new URLSearchParams(location.search);
-  if (query.has('file')) {
-    source.setAttribute('data', query.get('file'));
-  } else if (source.contentDocument) {
-    //loadSource();
-    console.log('init', source.contentDocument);
-  }
-  const target = document.body;
-  target.addEventListener("dragover", ev => ev.preventDefault());
-  target.addEventListener("dragleave", ev => {
-    ev.preventDefault();
-    if (ev.target.id === 'files') {
-      document.body.classList.remove('dragging');
+  function initContent(parameters) {
+    const source = document.getElementById('zinecontent');
+    //source.onload = () => ;
+    const query = new URLSearchParams(location.search);
+    if (query.has('file')) {
+      const path = query.get('file').split(/\/+/);
+      if (path.length === 0) {
+        //TODO:error
+        console.warn('missing file value', query.get('file'), path);
+        createErrorZine('Missing file name.');
+      } else if (path[0] === '') {
+        //TODO:error
+        console.warn('no relative path', query.get('file'), path);
+        createErrorZine('File path must be relative to the page folder.\n\n`' + query.get('file') + '`');
+      } else if (path.includes('..')) {
+        console.warn('invalid file path', query.get('file'), path);
+        createErrorZine('Invalid file path.\n\n`' + query.get('file') + '`');
+      } else {
+        //console.debug(path);
+        const mdfile = path.pop();
+        //console.debug(path, mdfile);
+        if (path.length === 0)
+          loadZine('.', mdfile);
+        else
+          loadZine(path.join('/'), mdfile);
+      }
+      //source.setAttribute('data', query.get('file'));
+    } else if (source.textContent !== '') {
+      //loadSource();
+      createZine(source.textContent, '.');
+      //console.debug('init', 'direct');
+    } else {
+      //Fallback to default zine
+      loadZine('userguide', 'zine.content.md');
     }
-  });
-  target.addEventListener("dragenter", initDragging);
-  target.addEventListener("drop", handleNewFiles);
+  }
+  function initDragAndDrop(parameters) {
+    const target = document.body;
+    target.addEventListener("dragover", ev => ev.preventDefault());
+    target.addEventListener("dragleave", ev => {
+      ev.preventDefault();
+      if (ev.target.id === 'files') {
+        document.body.classList.remove('dragging');
+      }
+    });
+    target.addEventListener("dragenter", initDragging);
+    target.addEventListener("drop", handleNewFiles);
+  }
+
+  initContent();
+  initDragAndDrop();
 }
 
 if (document.readyState === 'loading') {
