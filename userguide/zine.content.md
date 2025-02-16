@@ -36,8 +36,8 @@ based Zine creator
 
 ## Markdown and HTML
 
-Write some Markdown inside the HTML file. It will be converted into
-HTML and be rendered in your Browser.
+Write some Markdown and drag it to the editor.
+It will be converted into HTML and be rendered in your Browser.
 
 Write Text. Use images. Let your imagination flow.
 As long as your Browser can display it, it is fine to use.
@@ -48,13 +48,12 @@ title empty. It will not be inserted into the page.
 
 ## A local webserver
 
-To load the Markdown file from your disc a webserver is needed. Any
-server that can serve static files will do. May languages like Pyhton, PHP
-or Java (18+) and many others do have this ability.
+If used offline, the editor works best with a local webserver.
+Any server that can serve static files will do.
+Tools like Python, PHP or Java (18+) and many others do have this ability.
 
-> If you are not able to run such a server you can edit the `index.hmtl`
-> directly. Find the `id="zinecontent"` tag and write the markdown content
-> there.
+> Without a server you can edit the `index.hmtl` directly.
+> Find the `id="zinecontent"` tag and write the markdown content there.
 
 ## Custom Styles
 
@@ -97,10 +96,10 @@ header at the beginning of the document.
 
 Image are sized to fit a pages width.
 
-This tool utilizes the markdown "title" of an image to simulation css classes.
+This tool utilizes the markdown "title" of an image to simulation CSS classes.
 These classes can be used to "shrink" the image even more.
 
-Use `width50` to limit the width to 50% of the page. The sizes are
+Use `width50` to limit the width to 50% of the page. More sizes are
 `25`, `33`, `50`, `66` or `75`.
 
 Use "Custom Styles" to do more image styling.

@@ -51,7 +51,7 @@ sie aber auch leer lassen.
 
 Nutzt du den Editor offline funktioniert er am besten mit einem
 lokalen Webserver. Jeder Server, der statische Dateien versenden
-kann ist ausreichend.Bei z.B. Pyhton, PHP
+kann ist ausreichend. Bei z.B. Python, PHP
 oder Java (18+) sind entsprechende Hilfsmittel dabei.
 
 > Ohne Webserver kannst du auch die `index.hmtl` direkt bearbeiten.
