@@ -109,7 +109,7 @@ object#zinecontent{
     width:calc(100% - 2 * var(--border));
   }
   *:first-child{
-    margin-top:0px;
+    margin-top:0px !important;
   }
   img{
     max-width: 100%;
