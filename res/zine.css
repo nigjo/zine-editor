@@ -267,7 +267,7 @@ body.dragging {
 }
 
 @media print{
-  body{margin:0mm;padding:0mm;box-sizing:border-box;};
+  body{margin:0mm;padding:0mm;box-sizing:border-box;}
   .page{
     background-color: initial;
     border:none;
