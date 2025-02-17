@@ -301,7 +301,12 @@ function init() {
       //loadSource();
       createZine(source.textContent, '.');
       //console.debug('init', 'direct');
+    } else if(location.protocol==='file:'){
+      document.querySelector('nav').classList.add('local');
+      document.getElementById('ordered').checked = true;
+      createErrorZine('Loading via `file://` is disabled. Drag & Drop your files here.');
     } else {
+      console.debug(location);
       //Fallback to default zine
       loadZine('userguide', 'zine.content.md');
     }

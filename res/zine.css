@@ -27,6 +27,13 @@ nav{
       cursor:pointer;
     }
   }
+  &.local{
+    button{
+      cursor: initial;
+      pointer-events:none;
+      color:silver;
+    }
+  }
 }
 object#zinecontent{
   width: 100%;
