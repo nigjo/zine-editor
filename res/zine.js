@@ -94,7 +94,7 @@ class FileManager {
         this.removeFile(file.name);
         this.updateList()
                 .then(d => createZine(d))
-                .catch(e => console.error(e));
+                .catch(e => createErrorZine(e));
         ;
       };
       fig.append(del);
