@@ -1,9 +1,21 @@
-function l10n(key, fallback) {
-  if (key in langData) {
-    return langData[key];
+function l10n(key, fallback, ...args) {
+
+  if (args.length === 0) {
+    if (key in window.langData) {
+      return window.langData[key];
+    }
+    return fallback;
+  } else {
+    console.log('TEMPLATE', args);
+    //from https://stackoverflow.com/a/67022370
+    const message = Object.keys(args)
+            .reduce((acc, key) => acc.replaceAll(`\{${key}\}`, args[key]),
+                    l10n(key, fallback));
+    console.log('TEMPLATE', 'msg=', message);
+    return message;
   }
-  return fallback;
 }
+
 function updateLocale() {
   const langTag = document.getElementById('lang_' + navigator.language);
   if (langTag) {
