@@ -253,7 +253,7 @@ function handleNewFiles(ev) {
 
   fileManager.updateList()
           .then(d => createZine(d))
-          .catch(e => console.error(e));
+          .catch(e => createErrorZine(e));
 }
 
 function loadZine(basedir, mdfile) {
