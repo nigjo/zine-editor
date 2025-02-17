@@ -8,6 +8,25 @@
 //import markdownitDeflist from 'https://cdn.jsdelivr.net/npm/markdown-it-deflist@3.0.0/+esm';
 //import markdownitDeflist from './markdown-it-deflist.min.js';
 
+document.addEventListener('lang-loaded', e => {
+  switch (e.detail.lang) {
+    case 'de':
+      e.detail.data['error.title'] = 'Fehler';
+      e.detail.data['error.no_markdown_file'] =
+              'Keine Markdowndatei gefunden.\nFüge eine `.md`-Datei hinzu.';
+      e.detail.data['error.args.no_filename'] = 'Fehlender Dateiname';
+      e.detail.data['error.arg.not_relative'] =
+              'Dateipfad muss relativ zum Ordner dieser Seite sein.\n\n`{0}`';
+      e.detail.data['error.arg.invalid_path'] =
+              'Ungültiger Pfad.\n\n`{0}`';
+      e.detail.data['error.file_protocol'] =
+              'Nachladen via `file://` Protokoll ist deaktiviert.'
+              + ' Dateien per Drag&Drop hier einfügen.';
+      break;
+  }
+});
+
+
 const md = markdownit()
         .use(markdownitDeflist);
 
@@ -92,13 +111,18 @@ class FileManager {
     if (mdFile) {
       return mdFile.text();
     }
-    return Promise.reject('No markdown file found.\nadd one `.md` file.');
+    return Promise.reject(
+            l10n('error.no_markdown_file',
+                    'No markdown file found.\nadd one `.md` file.'
+                    ));
   }
 }
 const fileManager = new FileManager();
 
 function createErrorZine(message) {
-  createZine('# Error\n\n' + message);
+  createZine('# '
+          + l10n('error.title', 'Error')
+          + '\n\n' + message);
 }
 
 function createZine(rawMdText, basedir) {
@@ -279,14 +303,17 @@ function init() {
       if (path.length === 0) {
         //TODO:error
         console.warn('missing file value', query.get('file'), path);
-        createErrorZine('Missing file name.');
+        createErrorZine(l10n('error.args.no_filename', 'Missing file name.'));
       } else if (path[0] === '') {
         //TODO:error
         console.warn('no relative path', query.get('file'), path);
-        createErrorZine('File path must be relative to the page folder.\n\n`' + query.get('file') + '`');
+        createErrorZine(l10n('error.arg.not_relative',
+                'File path must be relative to the page folder.\n\n`{0}`',
+                query.get('file')));
       } else if (path.includes('..')) {
         console.warn('invalid file path', query.get('file'), path);
-        createErrorZine('Invalid file path.\n\n`' + query.get('file') + '`');
+        createErrorZine(l10n('error.arg.invalid_path',
+                'Invalid file path.\n\n`{0}`', query.get('file')));
       } else {
         //console.debug(path);
         const mdfile = path.pop();
@@ -301,14 +328,18 @@ function init() {
       //loadSource();
       createZine(source.textContent, '.');
       //console.debug('init', 'direct');
-    } else if(location.protocol==='file:'){
+    } else if (location.protocol === 'file:') {
       document.querySelector('nav').classList.add('local');
       document.getElementById('ordered').checked = true;
-      createErrorZine('Loading via `file://` is disabled. Drag & Drop your files here.');
+      createErrorZine(l10n('error.file_protocol',
+              'Loading via `file://` is disabled. Drag & Drop your files here.'));
     } else {
       console.debug(location);
       //Fallback to default zine
-      loadZine('userguide', 'zine.content.md');
+      if (navigator.language === 'de')
+        loadZine('userguide', 'zine.content_de.md');
+      else
+        loadZine('userguide', 'zine.content.md');
     }
   }
   function initDragAndDrop(parameters) {
