@@ -20,7 +20,7 @@ document.addEventListener('lang-loaded', e => {
       e.detail.data['error.arg.invalid_path'] =
               'Ungültiger Pfad.\n\n`{0}`';
       e.detail.data['error.file_protocol'] =
-              'Nachladen via `file://` Protokoll ist deaktiviert.'
+              'Nachladen via `file://` Protokoll ist nicht möglich.'
               + ' Dateien per Drag&Drop hier einfügen.';
       break;
   }
@@ -334,7 +334,7 @@ function init() {
       document.querySelector('nav').classList.add('local');
       document.getElementById('ordered').checked = true;
       createErrorZine(l10n('error.file_protocol',
-              'Loading via `file://` is disabled. Drag & Drop your files here.'));
+              'Loading via `file://` is not allowed. Drag & Drop your files here.'));
     } else if (query.has('file')) {
       loadCustomFile(query);
     } else {
