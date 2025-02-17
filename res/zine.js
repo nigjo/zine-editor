@@ -336,7 +336,7 @@ function init() {
     } else {
       console.debug(location);
       //Fallback to default zine
-      if (navigator.language === 'de')
+      if (document.documentElement.getAttribute('lang') === 'de')
         loadZine('userguide', 'zine.content_de.md');
       else
         loadZine('userguide', 'zine.content.md');
