@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Zine Editor</title>
+    <title data-l10n="head.title">Zine Editor</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="./favicon.png" sizes="96x96" type="image/png">
@@ -17,19 +17,19 @@
     <input class="noprint noview" id="ordered" type="checkbox" name="ordered">
     <input class="noprint noview" id="borderless" type="checkbox" name="borderless">
     <div class="options noprint">
-      <p>Sheet size:
-        <label class="selector" for="sizeA4">DIN/ISO A4</label>
-        <label class="selector" for="sizeLetter">US Letter</label>
-      </p><p>Browserdisplay:
-        <label class="selector" for="ordered">Page order</label>
-        <label class="selector" for="rotate">Rotated</label>
-      </p><p>Options:
-        <label class="selector" for="borderless">No margings</label>
+      <p><span data-l10n="option.sheet_size">Sheet size</span>:
+        <label class="selector" for="sizeA4" data-l10n="option.sheet_a4">DIN/ISO A4</label>
+        <label class="selector" for="sizeLetter" data-l10n="option.sheet_letter">US Letter</label>
+      </p><p><span data-l10n="option.view">Browser display</span>:
+        <label class="selector" for="ordered" data-l10n="option.view_ordered">Page order</label>
+        <label class="selector" for="rotate" data-l10n="option.view_rotated">Rotated</label>
+      </p><p><span data-l10n="option.more">Options</span>:
+        <label class="selector" for="borderless" data-l10n="option.no_margin">No margings</label>
       </p>
     </div>
     <nav class="noprint">
-      <button onclick="loadZine('userguide','zine.content.md')">Userguide</button>
-      <button onclick="loadZine('userguide','zine.content_de.md')">Anleitung</button>
+      <button onclick="loadZine('userguide', 'zine.content.md')">Userguide (en)</button>
+      <button onclick="loadZine('userguide', 'zine.content_de.md')">Anleitung (de)</button>
     </nav>
     <div id="zine">
       <!-- if do not have a local webserver available, write your
@@ -37,7 +37,7 @@
       <div id="zinecontent"></div>
     </div>
     <div id="files" class="noprint">
-      <h2>Files</h2>
+      <h2 data-l10n="head.files">Files</h2>
       <div class="filelist"></div>
     </div>
     <template id="pagebase">
@@ -50,7 +50,18 @@
       </div>
     </template>
     <footer class="noprint">
-      <a href="https://github.com/nigjo/zine-editor/">Fork me on Github</a>
+      <a href="https://github.com/nigjo/zine-editor/" data-l10n="footer.github">Fork me on Github</a>
     </footer>
+    <script type="application/json" id="lang_de">{
+      "option.sheet_size": "Papiergröße",
+      "option.view": "Browseranzeige",
+      "option.view_ordered": "Seitenreihenfolge",
+      "option.view_rotated": "Anzeige umdrehen",
+      "option.more": "Einstellungen",
+      "option.no_margin": "Ohne Rand",
+      "head.files": "Dateien",
+      "footer.github": "Bearbeite mich bei Github"
+      }</script>
+    <script src="res/lang.js"></script>
   </body>
 </html>
