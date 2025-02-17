@@ -294,55 +294,58 @@ function loadZine(basedir, mdfile) {
 
 function init() {
   console.log('init');
-  function initContent(parameters) {
+  function loadCustomFile(query) {
+    const fileArg = query.get('file');
+    const path = fileArg.split(/\/+/);
+    if (path.length === 0) {
+      //TODO:error
+      console.warn('missing file value', fileArg, path);
+      createErrorZine(l10n('error.args.no_filename', 'Missing file name.'));
+    } else if (path[0] === '') {
+      //TODO:error
+      console.warn('no relative path', fileArg, path);
+      createErrorZine(l10n('error.arg.not_relative',
+              'File path must be relative to the page folder.\n\n`{0}`',
+              fileArg));
+    } else if (path.includes('..')) {
+      console.warn('invalid file path', fileArg, path);
+      createErrorZine(l10n('error.arg.invalid_path',
+              'Invalid file path.\n\n`{0}`', fileArg));
+    } else {
+      //console.debug(path);
+      const mdfile = path.pop();
+      //console.debug(path, mdfile);
+      if (path.length === 0)
+        loadZine('.', mdfile);
+      else
+        loadZine(path.join('/'), mdfile);
+    }
+  }
+
+  function initContent() {
     const source = document.getElementById('zinecontent');
     //source.onload = () => ;
     const query = new URLSearchParams(location.search);
-    if (query.has('file')) {
-      const path = query.get('file').split(/\/+/);
-      if (path.length === 0) {
-        //TODO:error
-        console.warn('missing file value', query.get('file'), path);
-        createErrorZine(l10n('error.args.no_filename', 'Missing file name.'));
-      } else if (path[0] === '') {
-        //TODO:error
-        console.warn('no relative path', query.get('file'), path);
-        createErrorZine(l10n('error.arg.not_relative',
-                'File path must be relative to the page folder.\n\n`{0}`',
-                query.get('file')));
-      } else if (path.includes('..')) {
-        console.warn('invalid file path', query.get('file'), path);
-        createErrorZine(l10n('error.arg.invalid_path',
-                'Invalid file path.\n\n`{0}`', query.get('file')));
-      } else {
-        //console.debug(path);
-        const mdfile = path.pop();
-        //console.debug(path, mdfile);
-        if (path.length === 0)
-          loadZine('.', mdfile);
-        else
-          loadZine(path.join('/'), mdfile);
-      }
-      //source.setAttribute('data', query.get('file'));
-    } else if (source.textContent !== '') {
-      //loadSource();
+    if (source.textContent !== '') {
+      //load zine content from index.html. Always.
       createZine(source.textContent, '.');
-      //console.debug('init', 'direct');
     } else if (location.protocol === 'file:') {
+      //no webserver used for editor
       document.querySelector('nav').classList.add('local');
       document.getElementById('ordered').checked = true;
       createErrorZine(l10n('error.file_protocol',
               'Loading via `file://` is disabled. Drag & Drop your files here.'));
+    } else if (query.has('file')) {
+      loadCustomFile(query);
     } else {
-      console.debug(location);
-      //Fallback to default zine
+      //Show default zine on page load
       if (document.documentElement.getAttribute('lang') === 'de')
         loadZine('userguide', 'zine.content_de.md');
       else
         loadZine('userguide', 'zine.content.md');
     }
   }
-  function initDragAndDrop(parameters) {
+  function initDragAndDrop() {
     const target = document.body;
     target.addEventListener("dragover", ev => ev.preventDefault());
     target.addEventListener("dragleave", ev => {
