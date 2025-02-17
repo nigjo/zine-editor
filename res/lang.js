@@ -18,6 +18,7 @@ function l10n(key, fallback, ...args) {
 
 function updateLocale() {
   const langTag = document.getElementById('lang_' + navigator.language);
+  console.debug('INLINE', langTag);
   if (langTag) {
     return Promise.resolve(JSON.parse(langTag.textContent));
   } else {
@@ -32,15 +33,20 @@ function updateLocale() {
     });
   }
 }
-updateLocale().then(langData => {
-  if (langData) {
-    window.langData = langData;
-    console.log(langData);
+
+updateLocale().then(loadedData => {
+  window.langData = loadedData || {};
+  document.dispatchEvent(new CustomEvent('lang-loaded', {detail: {
+      data: window.langData,
+      lang: navigator.language
+    }}));
+  if (Object.keys(window.langData).length > 0) {
+    //console.log(langData);
     const texts = document.querySelectorAll('[data-l10n]');
-    console.log(texts);
+    //console.log(texts);
     for (const e of texts) {
-      if (e.dataset.l10n in langData) {
-        e.textContent = langData[e.dataset.l10n];
+      if (e.dataset.l10n in window.langData) {
+        e.textContent = window.langData[e.dataset.l10n];
       } else {
         console.log('skip entry', e.dataset.l10n);
       }
