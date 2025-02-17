@@ -1,8 +1,11 @@
 function l10n(key, fallback, ...args) {
+  if (!("langConfig" in window)) {
+    throw Error('language information not initialized, yet');
+  }
 
   if (args.length === 0) {
-    if (key in window.langData) {
-      return window.langData[key];
+    if (key in langConfig.data) {
+      return langConfig.data[key];
     }
     return fallback;
   } else {
@@ -17,14 +20,21 @@ function l10n(key, fallback, ...args) {
 }
 
 function updateLocale() {
-  const langTag = document.getElementById('lang_' + navigator.language);
+  const usedLang = navigator.language;
+  const langTag = document.getElementById('lang_' + usedLang);
   console.debug('INLINE', langTag);
   if (langTag) {
-    return Promise.resolve(JSON.parse(langTag.textContent));
+    return Promise.resolve({
+      lang: usedLang,
+      data: JSON.parse(langTag.textContent)
+    });
   } else {
-    return fetch('res/lang_' + navigator.language + '.json').then(r => {
+    return fetch('res/lang_' + usedLang + '.json').then(r => {
       if (r.ok)
-        return r.json();
+        return {
+          lang: usedLang,
+          data: r.json()
+        };
       if (r.status === 404)
         return null;
       throw r;
@@ -34,24 +44,26 @@ function updateLocale() {
   }
 }
 
-updateLocale().then(loadedData => {
-  window.langData = loadedData || {};
-  document.dispatchEvent(new CustomEvent('lang-loaded', {detail: {
-      data: window.langData,
-      lang: navigator.language
-    }}));
-  if (Object.keys(window.langData).length > 0) {
-    //console.log(langData);
+updateLocale().then(loaded => {
+  window.langConfig = {
+    lang: loaded ? loaded.lang : 'en',
+    data: loaded ? loaded.data : {}
+  };
+  //window.langData = loaded ? loaded.data : {};
+  document.dispatchEvent(new CustomEvent('lang-loaded', {detail: langConfig}));
+  document.documentElement.setAttribute("lang", langConfig.lang);
+  if (Object.keys(langConfig.data).length > 0) {
+    console.log(langConfig);
     const texts = document.querySelectorAll('[data-l10n]');
     //console.log(texts);
     for (const e of texts) {
-      if (e.dataset.l10n in window.langData) {
-        e.textContent = window.langData[e.dataset.l10n];
+      if (e.dataset.l10n in langConfig.data) {
+        e.textContent = langConfig.data[e.dataset.l10n];
       } else {
         console.log('skip entry', e.dataset.l10n);
       }
     }
   } else {
-    console.log('no lang data for ' + navigator.language);
+    console.log('no lang data for ' + langConfig.lang);
   }
 }).catch(e => console.warn(e));
