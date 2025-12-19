@@ -1,5 +1,9 @@
 # Zine Creator
 
+> [!IMPORTANT]
+> 
+> This repo has been moved to [codeberg.org](https://codeberg.org/nigjo/zine-editor)
+
 A Markdown/Browser based Zine creator.
 
 ##
